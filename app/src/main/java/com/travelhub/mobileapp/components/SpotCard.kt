@@ -42,7 +42,6 @@ fun SpotCard(
 ) {
     Card(
         modifier = modifier
-            .width(220.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)

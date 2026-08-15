@@ -5,15 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.MockAuthRepository
+import com.travelhub.mobileapp.data.repository.MockPostRepository
+import com.travelhub.mobileapp.data.repository.MockSpotRepository
 import com.travelhub.mobileapp.ui.auth.LoginViewModel
 import com.travelhub.mobileapp.ui.auth.RegisterViewModel
+import com.travelhub.mobileapp.ui.explore.ExploreViewModel
+import com.travelhub.mobileapp.ui.home.HomeViewModel
 import com.travelhub.mobileapp.ui.onboarding.OnboardingViewModel
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
 
 class AppViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val preferences = AppPreferences(context.applicationContext)
-        val authRepository = MockAuthRepository() // swap for real repo in step 19/20
+        val authRepository = MockAuthRepository()
+        val spotRepository = MockSpotRepository()
+        val postRepository = MockPostRepository()
 
         return when {
             modelClass.isAssignableFrom(SplashViewModel::class.java) ->
@@ -24,6 +30,10 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
                 LoginViewModel(authRepository, preferences) as T
             modelClass.isAssignableFrom(RegisterViewModel::class.java) ->
                 RegisterViewModel(authRepository, preferences) as T
+            modelClass.isAssignableFrom(HomeViewModel::class.java) ->
+                HomeViewModel(spotRepository, postRepository) as T
+            modelClass.isAssignableFrom(ExploreViewModel::class.java) ->
+                ExploreViewModel(spotRepository) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }
