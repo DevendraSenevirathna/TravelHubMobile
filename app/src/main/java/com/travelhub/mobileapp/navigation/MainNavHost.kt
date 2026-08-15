@@ -1,0 +1,66 @@
+package com.travelhub.mobileapp.navigation
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.travelhub.mobileapp.ui.PlaceholderScreen
+
+@Composable
+fun MainNavHost() {
+    val bottomNavController = rememberNavController()
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                bottomNavItems.forEach { item ->
+                    NavigationBarItem(
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            bottomNavController.navigate(item.route) {
+                                popUpTo(bottomNavController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { Text(item.label) }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = bottomNavController,
+            startDestination = Routes.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Routes.Home.route) { PlaceholderScreen("Home") }
+            composable(Routes.Explore.route) { PlaceholderScreen("Explore") }
+            composable(Routes.Services.route) { PlaceholderScreen("Services") }
+            composable(Routes.Favorites.route) { PlaceholderScreen("Favorites") }
+            composable(Routes.Profile.route) { PlaceholderScreen("Profile") }
+
+            // Detail screens reachable from within the main shell
+            composable(Routes.CreatePost.route) { PlaceholderScreen("Create Post") }
+            composable(Routes.EditProfile.route) { PlaceholderScreen("Edit Profile") }
+            composable(Routes.Settings.route) { PlaceholderScreen("Settings") }
+            composable(Routes.BookingHistory.route) { PlaceholderScreen("Booking History") }
+        }
+    }
+}
