@@ -19,7 +19,17 @@ import com.travelhub.mobileapp.components.LoadingState
 import com.travelhub.mobileapp.components.PostCard
 import com.travelhub.mobileapp.components.SpotCard
 import com.travelhub.mobileapp.ui.AppViewModelFactory
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.composed
 
+fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed {
+    this.clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+        onClick = onClick
+    )
+}
 @Composable
 fun HomeScreen(
     onSpotClick: (Int) -> Unit,
