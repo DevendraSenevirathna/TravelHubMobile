@@ -7,16 +7,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.travelhub.mobileapp.navigation.RootNavGraph
 import com.travelhub.mobileapp.ui.theme.TravelHubTheme
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             TravelHubTheme {
-                // Surface + NavHost go here once navigation is set up
+                val navController = rememberNavController()
+                RootNavGraph(navController = navController)
             }
         }
     }
