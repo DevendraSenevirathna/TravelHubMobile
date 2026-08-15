@@ -8,6 +8,7 @@ interface SpotRepository {
     suspend fun getTrendingSpots(): Result<List<Spot>>
     suspend fun getAllSpots(): Result<List<Spot>>
     suspend fun searchSpots(query: String, category: String?): Result<List<Spot>>
+    suspend fun getSpotById(id: Int): Result<Spot>
 }
 
 class MockSpotRepository : SpotRepository {
@@ -45,5 +46,10 @@ class MockSpotRepository : SpotRepository {
                 (category == null || spot.category == category)
         }
         return Result.success(filtered)
+    }
+    override suspend fun getSpotById(id: Int): Result<Spot> {
+        delay(300)
+        val spot = mockSpots.find { it.id == id }
+        return if (spot != null) Result.success(spot) else Result.failure(Exception("Spot not found"))
     }
 }

@@ -17,6 +17,9 @@ import androidx.navigation.compose.rememberNavController
 import com.travelhub.mobileapp.ui.PlaceholderScreen
 import com.travelhub.mobileapp.ui.home.HomeScreen
 import com.travelhub.mobileapp.ui.explore.ExploreScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.travelhub.mobileapp.ui.destinations.DestinationDetailsScreen
 
 @Composable
 fun MainNavHost() {
@@ -78,6 +81,17 @@ fun MainNavHost() {
             composable(Routes.EditProfile.route) { PlaceholderScreen("Edit Profile") }
             composable(Routes.Settings.route) { PlaceholderScreen("Settings") }
             composable(Routes.BookingHistory.route) { PlaceholderScreen("Booking History") }
+
+            composable(
+                route = Routes.DestinationDetails.route,
+                arguments = listOf(navArgument("spotId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val spotId = backStackEntry.arguments?.getInt("spotId") ?: return@composable
+                DestinationDetailsScreen(
+                    spotId = spotId,
+                    onBackClick = { bottomNavController.popBackStack() }
+                )
+            }
         }
     }
 }

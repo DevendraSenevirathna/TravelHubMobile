@@ -172,7 +172,7 @@ private fun DestinationDetailsContent(
             Text(
                 "Reviews (${state.reviews.size})",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 20.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 8.dp)
             )
         }
 
@@ -182,7 +182,7 @@ private fun DestinationDetailsContent(
                     "No reviews yet — be the first to share your experience.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 20.dp, bottom = 16.dp)
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
                 )
             }
         } else {
@@ -210,7 +210,7 @@ private fun DestinationDetailsContent(
             Text(
                 "Related Posts",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 20.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 8.dp)
             )
         }
 
@@ -220,7 +220,7 @@ private fun DestinationDetailsContent(
                     "No posts about this spot yet.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 20.dp, bottom = 24.dp)
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
                 )
             }
         } else {
