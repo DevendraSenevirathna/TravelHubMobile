@@ -15,7 +15,7 @@ class MockPostRepository : PostRepository {
         Post(1, "traveler1", null, 1, "Hidden Waterfall", "Amazing sunset at this spot! Truly peaceful.", null, "2026-08-10T12:00:00Z", 12, false),
         Post(2, "traveler2", null, 2, "Emerald Ridge", "Woke up at 4am for this view — worth every step.", null, "2026-08-11T06:30:00Z", 27, true),
         Post(3, "traveler3", null, 3, "Sunset Cove", "Found this hidden beach completely by accident!", null, "2026-08-12T17:15:00Z", 8, false),
-        Post(4, "traveler4", null, null, "Just packed for my next adventure. Where should I go next?", null, "2026-08-13T09:00:00Z", 5, false)
+        Post(4, "traveler4", null, null, null, "Just packed for my next adventure. Where should I go next?", null, "2026-08-13T09:00:00Z", 5, false)
     )
 
     override suspend fun getFeed(): Result<List<Post>> {
