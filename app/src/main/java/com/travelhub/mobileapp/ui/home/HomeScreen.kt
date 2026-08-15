@@ -22,7 +22,7 @@ import com.travelhub.mobileapp.ui.AppViewModelFactory
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.composed
-
+import androidx.compose.runtime.remember
 fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed {
     this.clickable(
         interactionSource = remember { MutableInteractionSource() },
@@ -106,7 +106,8 @@ private fun HomeContent(
                             rating = spot.averageRating,
                             isFavorite = spot.id in state.favoriteSpotIds,
                             onClick = { onSpotClick(spot.id) },
-                            onFavoriteClick = { onFavoriteClick(spot.id) }
+                            onFavoriteClick = { onFavoriteClick(spot.id) },
+                            modifier = Modifier.width(220.dp)
                         )
                     }
                 }
@@ -130,7 +131,8 @@ private fun HomeContent(
                             rating = spot.averageRating,
                             isFavorite = spot.id in state.favoriteSpotIds,
                             onClick = { onSpotClick(spot.id) },
-                            onFavoriteClick = { onFavoriteClick(spot.id) }
+                            onFavoriteClick = { onFavoriteClick(spot.id) },
+                            modifier = Modifier.width(220.dp)
                         )
                     }
                 }

@@ -9,6 +9,7 @@ import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
 import com.travelhub.mobileapp.ui.auth.LoginViewModel
 import com.travelhub.mobileapp.ui.auth.RegisterViewModel
+import com.travelhub.mobileapp.ui.explore.ExploreViewModel
 import com.travelhub.mobileapp.ui.home.HomeViewModel
 import com.travelhub.mobileapp.ui.onboarding.OnboardingViewModel
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
@@ -31,6 +32,8 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
                 RegisterViewModel(authRepository, preferences) as T
             modelClass.isAssignableFrom(HomeViewModel::class.java) ->
                 HomeViewModel(spotRepository, postRepository) as T
+            modelClass.isAssignableFrom(ExploreViewModel::class.java) ->
+                ExploreViewModel(spotRepository) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }

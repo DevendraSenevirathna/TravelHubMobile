@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.travelhub.mobileapp.ui.PlaceholderScreen
 import com.travelhub.mobileapp.ui.home.HomeScreen
+import com.travelhub.mobileapp.ui.explore.ExploreScreen
 
 @Composable
 fun MainNavHost() {
@@ -61,7 +62,13 @@ fun MainNavHost() {
                     }
                 )
             }
-            composable(Routes.Explore.route) { PlaceholderScreen("Explore") }
+            composable(Routes.Explore.route) {
+                ExploreScreen(
+                    onSpotClick = { spotId ->
+                        bottomNavController.navigate(Routes.DestinationDetails.createRoute(spotId))
+                    }
+                )
+            }
             composable(Routes.Services.route) { PlaceholderScreen("Services") }
             composable(Routes.Favorites.route) { PlaceholderScreen("Favorites") }
             composable(Routes.Profile.route) { PlaceholderScreen("Profile") }
