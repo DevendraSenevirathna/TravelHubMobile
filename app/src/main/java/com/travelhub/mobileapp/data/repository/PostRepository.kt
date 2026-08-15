@@ -7,6 +7,7 @@ interface PostRepository {
     suspend fun getFeed(): Result<List<Post>>
     suspend fun toggleLike(postId: Int): Result<Boolean>
     suspend fun createPost(caption: String, spotId: Int?): Result<Post>
+    suspend fun getPostsForSpot(spotId: Int): Result<List<Post>>
 }
 
 class MockPostRepository : PostRepository {
@@ -52,5 +53,9 @@ class MockPostRepository : PostRepository {
         )
         mockPosts.add(0, newPost)
         return Result.success(newPost)
+    }
+    override suspend fun getPostsForSpot(spotId: Int): Result<List<Post>> {
+        delay(300)
+        return Result.success(mockPosts.filter { it.spotId == spotId })
     }
 }
