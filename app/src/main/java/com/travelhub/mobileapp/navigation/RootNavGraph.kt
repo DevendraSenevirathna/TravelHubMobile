@@ -11,6 +11,7 @@ import com.travelhub.mobileapp.ui.AppViewModelFactory
 import com.travelhub.mobileapp.ui.PlaceholderScreen
 import com.travelhub.mobileapp.ui.splash.SplashScreen
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
+import com.travelhub.mobileapp.ui.onboarding.OnboardingScreen
 
 @Composable
 fun RootNavGraph(navController: NavHostController) {
@@ -48,7 +49,13 @@ fun RootNavGraph(navController: NavHostController) {
         // Auth flow — nested graph, inlined directly here
         navigation(startDestination = Routes.Onboarding.route, route = Graph.AUTH) {
             composable(Routes.Onboarding.route) {
-                PlaceholderScreen("Onboarding")
+                OnboardingScreen(
+                    onFinished = {
+                        navController.navigate(Routes.Login.route) {
+                            popUpTo(Graph.AUTH) { inclusive = true }
+                        }
+                    }
+                )
             }
             composable(Routes.Login.route) {
                 PlaceholderScreen("Login")

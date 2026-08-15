@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.travelhub.mobileapp.data.local.AppPreferences
+import com.travelhub.mobileapp.ui.onboarding.OnboardingViewModel
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
 
 class AppViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -12,6 +13,8 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
         return when {
             modelClass.isAssignableFrom(SplashViewModel::class.java) ->
                 SplashViewModel(preferences) as T
+            modelClass.isAssignableFrom(OnboardingViewModel::class.java) ->
+                OnboardingViewModel(preferences) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }
