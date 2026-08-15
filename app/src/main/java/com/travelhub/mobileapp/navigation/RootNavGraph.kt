@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.travelhub.mobileapp.ui.AppViewModelFactory
 import com.travelhub.mobileapp.ui.PlaceholderScreen
+import com.travelhub.mobileapp.ui.auth.LoginScreen
+import com.travelhub.mobileapp.ui.auth.RegisterScreen
 import com.travelhub.mobileapp.ui.splash.SplashScreen
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
 import com.travelhub.mobileapp.ui.onboarding.OnboardingScreen
@@ -58,10 +60,30 @@ fun RootNavGraph(navController: NavHostController) {
                 )
             }
             composable(Routes.Login.route) {
-                PlaceholderScreen("Login")
+                LoginScreen(
+                    onLoginSuccess = {
+                        navController.navigate(Graph.MAIN) {
+                            popUpTo(Graph.ROOT) { inclusive = false }
+                            popUpTo(Routes.Login.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToRegister = {
+                        navController.navigate(Routes.Register.route)
+                    }
+                )
             }
             composable(Routes.Register.route) {
-                PlaceholderScreen("Register")
+                RegisterScreen(
+                    onRegisterSuccess = {
+                        navController.navigate(Graph.MAIN) {
+                            popUpTo(Graph.ROOT) { inclusive = false }
+                            popUpTo(Routes.Login.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
 
