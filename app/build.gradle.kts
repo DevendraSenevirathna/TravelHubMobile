@@ -6,8 +6,7 @@ plugins {
 android {
     namespace = "com.travelhub.mobileapp"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
+        version = release(37) {
         }
     }
 
