@@ -72,7 +72,13 @@ fun MainNavHost() {
                         bottomNavController.navigate(Routes.PostDetails.createRoute(postId))
                     },
                     onSearchClick = {
-                        bottomNavController.navigate(Routes.Explore.route)
+                        bottomNavController.navigate(Routes.Explore.route) {
+                            popUpTo(bottomNavController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
