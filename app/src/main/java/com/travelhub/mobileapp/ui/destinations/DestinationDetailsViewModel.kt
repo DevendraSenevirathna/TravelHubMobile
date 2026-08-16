@@ -55,6 +55,23 @@ class DestinationDetailsViewModel(
         }
     }
 
+    fun toggleLikeOnPost(postId: Int) {
+        val current = _uiState.value
+        if (current is DestinationDetailsUiState.Success) {
+            viewModelScope.launch {
+                postRepository.toggleLike(postId)
+                val updatedPosts = current.relatedPosts.map { post ->
+                    if (post.id == postId) {
+                        post.copy(
+                            isLiked = !post.isLiked,
+                            likesCount = if (post.isLiked) post.likesCount - 1 else post.likesCount + 1
+                        )
+                    } else post
+                }
+                _uiState.value = current.copy(relatedPosts = updatedPosts)
+            }
+        }
+    }
     fun toggleFavorite() {
         val current = _uiState.value
         if (current is DestinationDetailsUiState.Success) {

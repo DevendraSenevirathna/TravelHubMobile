@@ -35,7 +35,8 @@ import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
 @Composable
 fun DestinationDetailsScreen(
     spotId: Int,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onPostClick: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val viewModel: DestinationDetailsViewModel = viewModel(
@@ -79,6 +80,8 @@ fun DestinationDetailsScreen(
                 state = state,
                 isFavorite = state.spot.id in favoriteSpotIds,
                 onFavoriteClick = viewModel::toggleFavorite,
+                onPostClick = onPostClick,
+                onPostLikeClick = viewModel::toggleLikeOnPost,   // ← new
                 modifier = Modifier.weight(1f)
             )
         }
@@ -88,9 +91,11 @@ fun DestinationDetailsScreen(
 @Composable
 private fun DestinationDetailsContent(
     state: DestinationDetailsUiState.Success,
+    isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isFavorite: Boolean
+    onPostClick: (Int) -> Unit,
+    onPostLikeClick: (Int) -> Unit,   // ← add this
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.fillMaxWidth()) {
         item {
@@ -244,8 +249,8 @@ private fun DestinationDetailsContent(
                                 spotName = post.spotName,
                                 likesCount = post.likesCount,
                                 isLiked = post.isLiked,
-                                onLikeClick = {},
-                                onClick = {}
+                                onLikeClick = { onPostLikeClick(post.id) },
+                                onClick = { onPostClick(post.id) }   // ← changed
                             )
                         }
                     }

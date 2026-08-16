@@ -185,7 +185,10 @@ fun MainNavHost() {
                 val spotId = backStackEntry.arguments?.getInt("spotId") ?: return@composable
                 DestinationDetailsScreen(
                     spotId = spotId,
-                    onBackClick = { bottomNavController.popBackStack() }
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onPostClick = { postId ->
+                        bottomNavController.navigate(Routes.PostDetails.createRoute(postId))
+                    }
                 )
             }
         }
