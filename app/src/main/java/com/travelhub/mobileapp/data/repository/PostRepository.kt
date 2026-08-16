@@ -8,6 +8,9 @@ interface PostRepository {
     suspend fun toggleLike(postId: Int): Result<Boolean>
     suspend fun createPost(caption: String, spotId: Int?): Result<Post>
     suspend fun getPostsForSpot(spotId: Int): Result<List<Post>>
+    suspend fun getPostById(id: Int): Result<Post>
+    suspend fun updatePost(id: Int, caption: String): Result<Post>
+    suspend fun deletePost(id: Int): Result<Unit>
 }
 
 class MockPostRepository : PostRepository {
@@ -57,5 +60,25 @@ class MockPostRepository : PostRepository {
     override suspend fun getPostsForSpot(spotId: Int): Result<List<Post>> {
         delay(300)
         return Result.success(mockPosts.filter { it.spotId == spotId })
+    }
+    override suspend fun getPostById(id: Int): Result<Post> {
+        delay(300)
+        val post = mockPosts.find { it.id == id }
+        return if (post != null) Result.success(post) else Result.failure(Exception("Post not found"))
+    }
+
+    override suspend fun updatePost(id: Int, caption: String): Result<Post> {
+        delay(400)
+        val index = mockPosts.indexOfFirst { it.id == id }
+        if (index == -1) return Result.failure(Exception("Post not found"))
+        val updated = mockPosts[index].copy(caption = caption)
+        mockPosts[index] = updated
+        return Result.success(updated)
+    }
+
+    override suspend fun deletePost(id: Int): Result<Unit> {
+        delay(400)
+        val removed = mockPosts.removeIf { it.id == id }
+        return if (removed) Result.success(Unit) else Result.failure(Exception("Post not found"))
     }
 }

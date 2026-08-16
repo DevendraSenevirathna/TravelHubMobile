@@ -33,6 +33,7 @@ fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed {
 @Composable
 fun HomeScreen(
     onSpotClick: (Int) -> Unit,
+    onPostClick: (Int) -> Unit,
     onSearchClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -49,6 +50,7 @@ fun HomeScreen(
         is HomeUiState.Success -> HomeContent(
             state = state,
             onSpotClick = onSpotClick,
+            onPostClick = onPostClick,
             onSearchClick = onSearchClick,
             onFavoriteClick = viewModel::toggleFavorite,
             onLikeClick = viewModel::toggleLike
@@ -60,6 +62,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeUiState.Success,
     onSpotClick: (Int) -> Unit,
+    onPostClick: (Int) -> Unit,
     onSearchClick: () -> Unit,
     onFavoriteClick: (Int) -> Unit,
     onLikeClick: (Int) -> Unit
@@ -163,7 +166,7 @@ private fun HomeContent(
                         likesCount = post.likesCount,
                         isLiked = post.isLiked,
                         onLikeClick = { onLikeClick(post.id) },
-                        onClick = { /* navigate to post details later */ }
+                        onClick = { onPostClick(post.id) }   // ← changed
                     )
                 }
             }
