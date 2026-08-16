@@ -31,7 +31,10 @@ import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockReviewRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
 import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
-
+import com.travelhub.mobileapp.data.api.RetrofitClient
+import com.travelhub.mobileapp.data.api.SpotApi
+import com.travelhub.mobileapp.data.local.AppPreferences
+import com.travelhub.mobileapp.data.repository.RealSpotRepository
 @Composable
 fun DestinationDetailsScreen(
     spotId: Int,
@@ -43,9 +46,13 @@ fun DestinationDetailsScreen(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                val preferences = AppPreferences(context.applicationContext)
+                val retrofit = RetrofitClient.getInstance(preferences)
+                val spotApi = retrofit.create(SpotApi::class.java)
+
                 return DestinationDetailsViewModel(
                     spotId = spotId,
-                    spotRepository = MockSpotRepository(),
+                    spotRepository = RealSpotRepository(spotApi),
                     reviewRepository = MockReviewRepository(),
                     postRepository = MockPostRepository(),
                     favoriteRepository = MockFavoriteRepository
