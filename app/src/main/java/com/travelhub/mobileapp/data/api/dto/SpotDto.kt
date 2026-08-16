@@ -20,7 +20,7 @@ data class SpotDto(
     val created_by: String,
     val created_at: String,
     val images: List<SpotImageDto> = emptyList(),
-    val average_rating: Double = 0.0
+    val average_rating: Double? = null   // ← nullable — backend sends null when no reviews exist yet
 )
 
 @Serializable

@@ -15,8 +15,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.travelhub.mobileapp.components.CategoryChip
+import com.travelhub.mobileapp.data.api.RetrofitClient
+import com.travelhub.mobileapp.data.api.SpotApi
+import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
+import com.travelhub.mobileapp.data.repository.RealSpotRepository
 
 @Composable
 fun CreatePostScreen(
@@ -24,13 +28,18 @@ fun CreatePostScreen(
     onBackClick: () -> Unit,
     onSubmitSuccess: () -> Unit
 ) {
+    val context = LocalContext.current
     val viewModel: CreatePostViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val preferences = AppPreferences(context.applicationContext)
+                val retrofit = RetrofitClient.getInstance(preferences)
+                val spotApi = retrofit.create(SpotApi::class.java)
+
                 return CreatePostViewModel(
                     postRepository = MockPostRepository(),
-                    spotRepository = MockSpotRepository(),
+                    spotRepository = RealSpotRepository(spotApi),
                     editingPostId = editingPostId
                 ) as T
             }

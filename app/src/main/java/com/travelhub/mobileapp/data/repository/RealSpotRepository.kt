@@ -81,7 +81,7 @@ private fun SpotDto.toDomain(): Spot {
         status = status,
         createdBy = created_by,
         imageUrl = images.firstOrNull()?.image,
-        averageRating = average_rating,
-        distanceKm = null // no GPS/distance data from backend yet
+        averageRating = average_rating ?: 0.0,   // ← null (no reviews yet) becomes 0.0 for display
+        distanceKm = null
     )
 }
