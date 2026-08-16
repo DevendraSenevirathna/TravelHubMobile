@@ -23,6 +23,12 @@ import com.travelhub.mobileapp.ui.destinations.DestinationDetailsScreen
 import com.travelhub.mobileapp.ui.favorites.FavoritesScreen
 import com.travelhub.mobileapp.ui.posts.CreatePostScreen
 import com.travelhub.mobileapp.ui.posts.PostDetailsScreen
+import com.travelhub.mobileapp.ui.services.ServicesScreen
+import com.travelhub.mobileapp.ui.services.ServiceDetailsScreen
+import com.travelhub.mobileapp.ui.services.BookingFormScreen
+import com.travelhub.mobileapp.ui.services.BookingConfirmationScreen
+import com.travelhub.mobileapp.ui.services.BookingHistoryScreen
+
 @Composable
 fun MainNavHost() {
     val bottomNavController = rememberNavController()
@@ -77,7 +83,54 @@ fun MainNavHost() {
                     }
                 )
             }
-            composable(Routes.Services.route) { PlaceholderScreen("Services") }
+            composable(Routes.Services.route) {
+                ServicesScreen(
+                    onServiceClick = { serviceId ->
+                        bottomNavController.navigate(Routes.ServiceDetails.createRoute(serviceId))
+                    },
+                    onBookingHistoryClick = {
+                        bottomNavController.navigate(Routes.BookingHistory.route)
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.ServiceDetails.route,
+                arguments = listOf(navArgument("serviceId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val serviceId = backStackEntry.arguments?.getInt("serviceId") ?: return@composable
+                ServiceDetailsScreen(
+                    serviceId = serviceId,
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onBookClick = { id -> bottomNavController.navigate(Routes.BookingForm.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Routes.BookingForm.route,
+                arguments = listOf(navArgument("serviceId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val serviceId = backStackEntry.arguments?.getInt("serviceId") ?: return@composable
+                BookingFormScreen(
+                    serviceId = serviceId,
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onBookingConfirmed = {
+                        bottomNavController.navigate(Routes.BookingConfirmation.route) {
+                            popUpTo(Routes.Services.route)
+                        }
+                    }
+                )
+            }
+
+            composable(Routes.BookingConfirmation.route) {
+                BookingConfirmationScreen(
+                    onDoneClick = {
+                        bottomNavController.navigate(Routes.Services.route) {
+                            popUpTo(Routes.Services.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
             composable(Routes.Favorites.route) {
                 FavoritesScreen(
                     onSpotClick = { spotId ->
@@ -121,7 +174,9 @@ fun MainNavHost() {
             }
             composable(Routes.EditProfile.route) { PlaceholderScreen("Edit Profile") }
             composable(Routes.Settings.route) { PlaceholderScreen("Settings") }
-            composable(Routes.BookingHistory.route) { PlaceholderScreen("Booking History") }
+            composable(Routes.BookingHistory.route) {
+                BookingHistoryScreen()
+            }
 
             composable(
                 route = Routes.DestinationDetails.route,
