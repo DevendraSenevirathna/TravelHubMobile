@@ -30,6 +30,7 @@ fun ExploreScreen(
     val uiState by viewModel.uiState.collectAsState()
     val query by viewModel.query.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val favoriteSpotIds by viewModel.favoriteSpotIds.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
@@ -93,9 +94,9 @@ fun ExploreScreen(
                                 category = spot.category,
                                 imageUrl = spot.imageUrl,
                                 rating = spot.averageRating,
-                                isFavorite = spot.id in state.favoriteSpotIds,
+                                isFavorite = spot.id in favoriteSpotIds,
+                                onFavoriteClick = { viewModel.toggleFavorite(spot) },
                                 onClick = { onSpotClick(spot.id) },
-                                onFavoriteClick = { viewModel.toggleFavorite(spot.id) },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

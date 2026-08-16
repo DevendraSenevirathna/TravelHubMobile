@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.MockAuthRepository
+import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
 import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
 import com.travelhub.mobileapp.ui.auth.LoginViewModel
 import com.travelhub.mobileapp.ui.auth.RegisterViewModel
 import com.travelhub.mobileapp.ui.explore.ExploreViewModel
+import com.travelhub.mobileapp.ui.favorites.FavoritesViewModel
 import com.travelhub.mobileapp.ui.home.HomeViewModel
 import com.travelhub.mobileapp.ui.onboarding.OnboardingViewModel
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
@@ -20,6 +22,7 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
         val authRepository = MockAuthRepository()
         val spotRepository = MockSpotRepository()
         val postRepository = MockPostRepository()
+        val favoriteRepository = MockFavoriteRepository // singleton object, same instance every time
 
         return when {
             modelClass.isAssignableFrom(SplashViewModel::class.java) ->
@@ -31,9 +34,11 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
             modelClass.isAssignableFrom(RegisterViewModel::class.java) ->
                 RegisterViewModel(authRepository, preferences) as T
             modelClass.isAssignableFrom(HomeViewModel::class.java) ->
-                HomeViewModel(spotRepository, postRepository) as T
+                HomeViewModel(spotRepository, postRepository, favoriteRepository) as T
             modelClass.isAssignableFrom(ExploreViewModel::class.java) ->
-                ExploreViewModel(spotRepository) as T
+                ExploreViewModel(spotRepository, favoriteRepository) as T
+            modelClass.isAssignableFrom(FavoritesViewModel::class.java) ->
+                FavoritesViewModel(favoriteRepository) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }

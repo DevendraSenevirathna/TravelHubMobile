@@ -1,11 +1,11 @@
 package com.travelhub.mobileapp.ui.destinations
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.travelhub.mobileapp.data.model.Post
 import com.travelhub.mobileapp.data.model.Review
 import com.travelhub.mobileapp.data.model.Spot
+import com.travelhub.mobileapp.data.repository.FavoriteRepository
 import com.travelhub.mobileapp.data.repository.PostRepository
 import com.travelhub.mobileapp.data.repository.ReviewRepository
 import com.travelhub.mobileapp.data.repository.SpotRepository
@@ -18,8 +18,7 @@ sealed class DestinationDetailsUiState {
     data class Success(
         val spot: Spot,
         val reviews: List<Review>,
-        val relatedPosts: List<Post>,
-        val isFavorite: Boolean = false
+        val relatedPosts: List<Post>
     ) : DestinationDetailsUiState()
     data class Error(val message: String) : DestinationDetailsUiState()
 }
@@ -28,11 +27,14 @@ class DestinationDetailsViewModel(
     private val spotId: Int,
     private val spotRepository: SpotRepository,
     private val reviewRepository: ReviewRepository,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DestinationDetailsUiState>(DestinationDetailsUiState.Loading)
     val uiState: StateFlow<DestinationDetailsUiState> = _uiState
+
+    val favoriteSpotIds: StateFlow<Set<Int>> = favoriteRepository.favoriteSpotIds
 
     init {
         load()
@@ -41,29 +43,24 @@ class DestinationDetailsViewModel(
     fun load() {
         viewModelScope.launch {
             _uiState.value = DestinationDetailsUiState.Loading
-            val spotResult = spotRepository.getSpotById(spotId)
-            val reviewsResult = reviewRepository.getReviewsForSpot(spotId)
-            val postsResult = postRepository.getPostsForSpot(spotId)
-
-            val spot = spotResult.getOrNull()
+            val spot = spotRepository.getSpotById(spotId).getOrNull()
             if (spot == null) {
                 _uiState.value = DestinationDetailsUiState.Error("Destination not found")
                 return@launch
             }
+            val reviews = reviewRepository.getReviewsForSpot(spotId).getOrDefault(emptyList())
+            val posts = postRepository.getPostsForSpot(spotId).getOrDefault(emptyList())
 
-            _uiState.value = DestinationDetailsUiState.Success(
-                spot = spot,
-                reviews = reviewsResult.getOrDefault(emptyList()),
-                relatedPosts = postsResult.getOrDefault(emptyList())
-            )
+            _uiState.value = DestinationDetailsUiState.Success(spot, reviews, posts)
         }
     }
 
     fun toggleFavorite() {
         val current = _uiState.value
         if (current is DestinationDetailsUiState.Success) {
-            _uiState.value = current.copy(isFavorite = !current.isFavorite)
-            // TODO: persist via FavoriteRepository once built (Favorites step)
+            viewModelScope.launch {
+                favoriteRepository.toggleFavorite(current.spot)
+            }
         }
     }
 
@@ -71,8 +68,7 @@ class DestinationDetailsViewModel(
         val current = _uiState.value
         if (current is DestinationDetailsUiState.Success) {
             viewModelScope.launch {
-                val result = reviewRepository.addReview(spotId, rating, comment)
-                result.onSuccess { newReview ->
+                reviewRepository.addReview(spotId, rating, comment).onSuccess { newReview ->
                     _uiState.value = current.copy(reviews = current.reviews + newReview)
                 }
             }

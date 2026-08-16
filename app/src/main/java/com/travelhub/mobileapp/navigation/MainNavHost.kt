@@ -20,6 +20,7 @@ import com.travelhub.mobileapp.ui.explore.ExploreScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.travelhub.mobileapp.ui.destinations.DestinationDetailsScreen
+import com.travelhub.mobileapp.ui.favorites.FavoritesScreen
 import com.travelhub.mobileapp.ui.posts.CreatePostScreen
 import com.travelhub.mobileapp.ui.posts.PostDetailsScreen
 @Composable
@@ -77,7 +78,13 @@ fun MainNavHost() {
                 )
             }
             composable(Routes.Services.route) { PlaceholderScreen("Services") }
-            composable(Routes.Favorites.route) { PlaceholderScreen("Favorites") }
+            composable(Routes.Favorites.route) {
+                FavoritesScreen(
+                    onSpotClick = { spotId ->
+                        bottomNavController.navigate(Routes.DestinationDetails.createRoute(spotId))
+                    }
+                )
+            }
             composable(Routes.Profile.route) { PlaceholderScreen("Profile") }
 
             // Detail screens reachable from within the main shell

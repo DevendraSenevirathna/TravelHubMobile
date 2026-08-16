@@ -3,6 +3,7 @@ package com.travelhub.mobileapp.ui.explore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.travelhub.mobileapp.data.model.Spot
+import com.travelhub.mobileapp.data.repository.FavoriteRepository
 import com.travelhub.mobileapp.data.repository.SpotRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,10 +11,7 @@ import kotlinx.coroutines.launch
 
 sealed class ExploreUiState {
     object Loading : ExploreUiState()
-    data class Success(
-        val spots: List<Spot>,
-        val favoriteSpotIds: Set<Int> = emptySet()
-    ) : ExploreUiState()
+    data class Success(val spots: List<Spot>) : ExploreUiState()
     data class Error(val message: String) : ExploreUiState()
 }
 
@@ -22,7 +20,8 @@ val categoryOptions = listOf(
 )
 
 class ExploreViewModel(
-    private val spotRepository: SpotRepository
+    private val spotRepository: SpotRepository,
+    private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ExploreUiState>(ExploreUiState.Loading)
@@ -33,6 +32,8 @@ class ExploreViewModel(
 
     private val _selectedCategory = MutableStateFlow<String?>(null)
     val selectedCategory: StateFlow<String?> = _selectedCategory
+
+    val favoriteSpotIds: StateFlow<Set<Int>> = favoriteRepository.favoriteSpotIds
 
     init {
         search()
@@ -59,15 +60,9 @@ class ExploreViewModel(
         }
     }
 
-    fun toggleFavorite(spotId: Int) {
-        val current = _uiState.value
-        if (current is ExploreUiState.Success) {
-            val updated = if (spotId in current.favoriteSpotIds) {
-                current.favoriteSpotIds - spotId
-            } else {
-                current.favoriteSpotIds + spotId
-            }
-            _uiState.value = current.copy(favoriteSpotIds = updated)
+    fun toggleFavorite(spot: Spot) {
+        viewModelScope.launch {
+            favoriteRepository.toggleFavorite(spot)
         }
     }
 }

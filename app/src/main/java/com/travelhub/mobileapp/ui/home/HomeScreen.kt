@@ -39,6 +39,7 @@ fun HomeScreen(
     val context = LocalContext.current
     val viewModel: HomeViewModel = viewModel(factory = AppViewModelFactory(context))
     val uiState by viewModel.uiState.collectAsState()
+    val favoriteSpotIds by viewModel.favoriteSpotIds.collectAsState()
 
     when (val state = uiState) {
         is HomeUiState.Loading -> LoadingState(modifier = Modifier.fillMaxSize())
@@ -49,10 +50,11 @@ fun HomeScreen(
         )
         is HomeUiState.Success -> HomeContent(
             state = state,
+            favoriteSpotIds = favoriteSpotIds,
             onSpotClick = onSpotClick,
             onPostClick = onPostClick,
             onSearchClick = onSearchClick,
-            onFavoriteClick = viewModel::toggleFavorite,
+            onFavoriteClick = { spot -> viewModel.toggleFavorite(spot) },
             onLikeClick = viewModel::toggleLike
         )
     }
@@ -61,10 +63,11 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState.Success,
+    favoriteSpotIds: Set<Int>,
     onSpotClick: (Int) -> Unit,
     onPostClick: (Int) -> Unit,
     onSearchClick: () -> Unit,
-    onFavoriteClick: (Int) -> Unit,
+    onFavoriteClick: (com.travelhub.mobileapp.data.model.Spot) -> Unit,
     onLikeClick: (Int) -> Unit
 ) {
     LazyColumn(
@@ -107,9 +110,9 @@ private fun HomeContent(
                             category = spot.category,
                             imageUrl = spot.imageUrl,
                             rating = spot.averageRating,
-                            isFavorite = spot.id in state.favoriteSpotIds,
+                            isFavorite = spot.id in favoriteSpotIds,
+                            onFavoriteClick = { onFavoriteClick(spot) },
                             onClick = { onSpotClick(spot.id) },
-                            onFavoriteClick = { onFavoriteClick(spot.id) },
                             modifier = Modifier.width(220.dp)
                         )
                     }
@@ -132,9 +135,9 @@ private fun HomeContent(
                             category = spot.category,
                             imageUrl = spot.imageUrl,
                             rating = spot.averageRating,
-                            isFavorite = spot.id in state.favoriteSpotIds,
+                            isFavorite = spot.id in favoriteSpotIds,
+                            onFavoriteClick = { onFavoriteClick(spot) },
                             onClick = { onSpotClick(spot.id) },
-                            onFavoriteClick = { onFavoriteClick(spot.id) },
                             modifier = Modifier.width(220.dp)
                         )
                     }

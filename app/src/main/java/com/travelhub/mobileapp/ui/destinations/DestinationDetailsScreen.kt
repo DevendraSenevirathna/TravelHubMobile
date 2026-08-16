@@ -30,6 +30,7 @@ import com.travelhub.mobileapp.components.PostCard
 import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockReviewRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
+import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
 
 @Composable
 fun DestinationDetailsScreen(
@@ -45,12 +46,14 @@ fun DestinationDetailsScreen(
                     spotId = spotId,
                     spotRepository = MockSpotRepository(),
                     reviewRepository = MockReviewRepository(),
-                    postRepository = MockPostRepository()
+                    postRepository = MockPostRepository(),
+                    favoriteRepository = MockFavoriteRepository
                 ) as T
             }
         }
     )
     val uiState by viewModel.uiState.collectAsState()
+    val favoriteSpotIds by viewModel.favoriteSpotIds.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Back button bar
@@ -74,6 +77,7 @@ fun DestinationDetailsScreen(
             )
             is DestinationDetailsUiState.Success -> DestinationDetailsContent(
                 state = state,
+                isFavorite = state.spot.id in favoriteSpotIds,
                 onFavoriteClick = viewModel::toggleFavorite,
                 modifier = Modifier.weight(1f)
             )
@@ -85,7 +89,8 @@ fun DestinationDetailsScreen(
 private fun DestinationDetailsContent(
     state: DestinationDetailsUiState.Success,
     onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFavorite: Boolean
 ) {
     LazyColumn(modifier = modifier.fillMaxWidth()) {
         item {
@@ -111,9 +116,9 @@ private fun DestinationDetailsContent(
                         .background(Color.Black.copy(alpha = 0.3f))
                 ) {
                     Icon(
-                        imageVector = if (state.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = if (state.isFavorite) Color(0xFFE53935) else Color.White
+                        tint = if (isFavorite) Color(0xFFE53935) else Color.White
                     )
                 }
             }

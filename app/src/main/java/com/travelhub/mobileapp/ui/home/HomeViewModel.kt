@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.travelhub.mobileapp.data.model.Post
 import com.travelhub.mobileapp.data.model.Spot
+import com.travelhub.mobileapp.data.repository.FavoriteRepository
 import com.travelhub.mobileapp.data.repository.PostRepository
 import com.travelhub.mobileapp.data.repository.SpotRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 sealed class HomeUiState {
@@ -16,19 +15,22 @@ sealed class HomeUiState {
     data class Success(
         val nearbySpots: List<Spot>,
         val trendingSpots: List<Spot>,
-        val feed: List<Post>,
-        val favoriteSpotIds: Set<Int> = emptySet()
+        val feed: List<Post>
     ) : HomeUiState()
     data class Error(val message: String) : HomeUiState()
 }
 
 class HomeViewModel(
     private val spotRepository: SpotRepository,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState
+
+    // Exposed separately so the UI can react to favorite changes independently
+    val favoriteSpotIds: StateFlow<Set<Int>> = favoriteRepository.favoriteSpotIds
 
     init {
         loadHome()
@@ -53,16 +55,9 @@ class HomeViewModel(
         }
     }
 
-    fun toggleFavorite(spotId: Int) {
-        val current = _uiState.value
-        if (current is HomeUiState.Success) {
-            val updated = if (spotId in current.favoriteSpotIds) {
-                current.favoriteSpotIds - spotId
-            } else {
-                current.favoriteSpotIds + spotId
-            }
-            _uiState.value = current.copy(favoriteSpotIds = updated)
-            // TODO: persist via FavoriteRepository once built (Favorites step)
+    fun toggleFavorite(spot: Spot) {
+        viewModelScope.launch {
+            favoriteRepository.toggleFavorite(spot)
         }
     }
 
