@@ -89,7 +89,14 @@ fun RootNavGraph(navController: NavHostController) {
 
         // Main app shell
         composable(Graph.MAIN) {
-            MainNavHost()
+            MainNavHost(
+                onLogout = {
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Graph.ROOT) { inclusive = false }
+                        popUpTo(Graph.MAIN) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

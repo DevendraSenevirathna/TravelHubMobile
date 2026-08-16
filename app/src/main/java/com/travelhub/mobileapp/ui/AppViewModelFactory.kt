@@ -7,6 +7,7 @@ import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.MockAuthRepository
 import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
 import com.travelhub.mobileapp.data.repository.MockPostRepository
+import com.travelhub.mobileapp.data.repository.MockProfileRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
 import com.travelhub.mobileapp.ui.auth.LoginViewModel
 import com.travelhub.mobileapp.ui.auth.RegisterViewModel
@@ -14,6 +15,8 @@ import com.travelhub.mobileapp.ui.explore.ExploreViewModel
 import com.travelhub.mobileapp.ui.favorites.FavoritesViewModel
 import com.travelhub.mobileapp.ui.home.HomeViewModel
 import com.travelhub.mobileapp.ui.onboarding.OnboardingViewModel
+import com.travelhub.mobileapp.ui.profile.EditProfileViewModel
+import com.travelhub.mobileapp.ui.profile.ProfileViewModel
 import com.travelhub.mobileapp.ui.splash.SplashViewModel
 
 class AppViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -22,7 +25,8 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
         val authRepository = MockAuthRepository()
         val spotRepository = MockSpotRepository()
         val postRepository = MockPostRepository()
-        val favoriteRepository = MockFavoriteRepository // singleton object, same instance every time
+        val favoriteRepository = MockFavoriteRepository
+        val profileRepository = MockProfileRepository
 
         return when {
             modelClass.isAssignableFrom(SplashViewModel::class.java) ->
@@ -39,6 +43,10 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
                 ExploreViewModel(spotRepository, favoriteRepository) as T
             modelClass.isAssignableFrom(FavoritesViewModel::class.java) ->
                 FavoritesViewModel(favoriteRepository) as T
+            modelClass.isAssignableFrom(ProfileViewModel::class.java) ->
+                ProfileViewModel(profileRepository, postRepository, preferences) as T
+            modelClass.isAssignableFrom(EditProfileViewModel::class.java) ->
+                EditProfileViewModel(profileRepository) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }
