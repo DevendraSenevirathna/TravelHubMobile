@@ -11,6 +11,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 import retrofit2.Retrofit
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 // Runs automatically when the server responds with 401. Tries to refresh the
 // access token once using the stored refresh token; if that also fails

@@ -8,6 +8,9 @@ import com.travelhub.mobileapp.data.model.LoginRequest
 import com.travelhub.mobileapp.data.model.RegisterRequest
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.jsonArray
 
 class RealAuthRepository(
     private val authApi: AuthApi,
