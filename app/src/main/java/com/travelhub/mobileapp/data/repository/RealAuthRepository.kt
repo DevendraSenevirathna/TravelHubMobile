@@ -24,6 +24,7 @@ class RealAuthRepository(
                 val body = response.body()
                 if (body != null) {
                     preferences.saveTokens(body.access, body.refresh)
+                    preferences.saveUsername(request.username)   // ← add this
                     Result.success(Unit)
                 } else {
                     Result.failure(Exception("Empty response from server"))

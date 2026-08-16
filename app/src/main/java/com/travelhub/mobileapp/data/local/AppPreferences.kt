@@ -17,6 +17,7 @@ class AppPreferences(private val context: Context) {
     private val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     private val ACCESS_TOKEN = stringPreferencesKey("access_token")
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+    private val USERNAME = stringPreferencesKey("username")
 
     val hasCompletedOnboarding: Flow<Boolean> = context.dataStore.data
         .map { prefs -> prefs[ONBOARDING_COMPLETE] ?: false }
@@ -24,6 +25,12 @@ class AppPreferences(private val context: Context) {
     val isLoggedIn: Flow<Boolean> = context.dataStore.data
         .map { prefs -> prefs[IS_LOGGED_IN] ?: false }
 
+    suspend fun saveUsername(username: String) {
+        context.dataStore.edit { prefs -> prefs[USERNAME] = username }
+    }
+
+    suspend fun getUsername(): String? =
+        context.dataStore.data.map { it[USERNAME] }.first()
     suspend fun setOnboardingComplete() {
         context.dataStore.edit { prefs -> prefs[ONBOARDING_COMPLETE] = true }
     }

@@ -28,6 +28,11 @@ import com.travelhub.mobileapp.data.repository.PostRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import com.travelhub.mobileapp.data.api.PostApi
+import com.travelhub.mobileapp.data.api.RetrofitClient
+import com.travelhub.mobileapp.data.local.AppPreferences
+import com.travelhub.mobileapp.data.repository.RealPostRepository
 
 sealed class PostDetailsUiState {
     object Loading : PostDetailsUiState()
@@ -82,16 +87,24 @@ class PostDetailsViewModel(
 @Composable
 fun PostDetailsScreen(
     postId: Int,
-    currentUsername: String = "you", // mock identity until real auth wires in (step 20)
     onBackClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onDeleted: () -> Unit
 ) {
+    val context = LocalContext.current
+    var currentUsername by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        currentUsername = AppPreferences(context.applicationContext).getUsername()
+    }
     val viewModel: PostDetailsViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return PostDetailsViewModel(postId, MockPostRepository()) as T
+                val preferences = AppPreferences(context.applicationContext)
+                val retrofit = RetrofitClient.getInstance(preferences)
+                val postApi = retrofit.create(PostApi::class.java)
+                return PostDetailsViewModel(postId, RealPostRepository(postApi)) as T
             }
         }
     )

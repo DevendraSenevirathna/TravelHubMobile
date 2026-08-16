@@ -27,6 +27,7 @@ import coil.compose.AsyncImage
 import com.travelhub.mobileapp.components.ErrorState
 import com.travelhub.mobileapp.components.LoadingState
 import com.travelhub.mobileapp.components.PostCard
+import com.travelhub.mobileapp.data.api.PostApi
 import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockReviewRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
@@ -34,6 +35,7 @@ import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
 import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.api.SpotApi
 import com.travelhub.mobileapp.data.local.AppPreferences
+import com.travelhub.mobileapp.data.repository.RealPostRepository
 import com.travelhub.mobileapp.data.repository.RealSpotRepository
 @Composable
 fun DestinationDetailsScreen(
@@ -49,12 +51,13 @@ fun DestinationDetailsScreen(
                 val preferences = AppPreferences(context.applicationContext)
                 val retrofit = RetrofitClient.getInstance(preferences)
                 val spotApi = retrofit.create(SpotApi::class.java)
+                val postApi = retrofit.create(PostApi::class.java)
 
                 return DestinationDetailsViewModel(
                     spotId = spotId,
                     spotRepository = RealSpotRepository(spotApi),
                     reviewRepository = MockReviewRepository(),
-                    postRepository = MockPostRepository(),
+                    postRepository = RealPostRepository(postApi),
                     favoriteRepository = MockFavoriteRepository
                 ) as T
             }
