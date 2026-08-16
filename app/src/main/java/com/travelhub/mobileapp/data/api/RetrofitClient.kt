@@ -25,12 +25,13 @@ object RetrofitClient {
 
     private fun buildRetrofit(preferences: AppPreferences): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY // verbose during dev; dial down for release builds
+            level = HttpLoggingInterceptor.Level.BODY
         }
 
         val client = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(preferences))
             .addInterceptor(loggingInterceptor)
+            .authenticator(TokenAuthenticator(preferences))   // ← add this
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()

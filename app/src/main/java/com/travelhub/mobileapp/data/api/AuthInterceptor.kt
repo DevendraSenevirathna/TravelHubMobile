@@ -1,10 +1,12 @@
 package com.travelhub.mobileapp.data.api
 
+import com.travelhub.mobileapp.data.api.dto.RefreshRequestDto
 import com.travelhub.mobileapp.data.local.AppPreferences
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 
+// Attaches the current access token to every outgoing request.
 class AuthInterceptor(
     private val preferences: AppPreferences
 ) : Interceptor {

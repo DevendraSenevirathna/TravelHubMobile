@@ -3,12 +3,10 @@ package com.travelhub.mobileapp.ui
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.travelhub.mobileapp.data.api.AuthApi
+import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.local.AppPreferences
-import com.travelhub.mobileapp.data.repository.MockAuthRepository
-import com.travelhub.mobileapp.data.repository.MockFavoriteRepository
-import com.travelhub.mobileapp.data.repository.MockPostRepository
-import com.travelhub.mobileapp.data.repository.MockProfileRepository
-import com.travelhub.mobileapp.data.repository.MockSpotRepository
+import com.travelhub.mobileapp.data.repository.*
 import com.travelhub.mobileapp.ui.auth.LoginViewModel
 import com.travelhub.mobileapp.ui.auth.RegisterViewModel
 import com.travelhub.mobileapp.ui.explore.ExploreViewModel
@@ -22,7 +20,12 @@ import com.travelhub.mobileapp.ui.splash.SplashViewModel
 class AppViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val preferences = AppPreferences(context.applicationContext)
-        val authRepository = MockAuthRepository()
+
+        val retrofit = RetrofitClient.getInstance(preferences)
+        val authApi = retrofit.create(AuthApi::class.java)
+        val authRepository: AuthRepository = RealAuthRepository(authApi, preferences) // ← swapped from Mock
+
+        // Still mock — swapped one-by-one in upcoming steps
         val spotRepository = MockSpotRepository()
         val postRepository = MockPostRepository()
         val favoriteRepository = MockFavoriteRepository
