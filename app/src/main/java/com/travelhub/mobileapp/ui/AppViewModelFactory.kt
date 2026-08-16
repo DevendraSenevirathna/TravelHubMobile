@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.travelhub.mobileapp.data.api.AuthApi
+import com.travelhub.mobileapp.data.api.PostApi
 import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.api.SpotApi
 import com.travelhub.mobileapp.data.local.AppPreferences
@@ -25,12 +26,13 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
 
         val authApi = retrofit.create(AuthApi::class.java)
         val spotApi = retrofit.create(SpotApi::class.java)
+        val postApi = retrofit.create(PostApi::class.java)
 
         val authRepository: AuthRepository = RealAuthRepository(authApi, preferences)
-        val spotRepository: SpotRepository = RealSpotRepository(spotApi) // ← swapped from Mock
+        val spotRepository: SpotRepository = RealSpotRepository(spotApi)
+        val postRepository: PostRepository = RealPostRepository(postApi) // ← swapped from Mock
 
-        // Still mock — swapped one-by-one in upcoming steps
-        val postRepository = MockPostRepository()
+        // Still mock — swapped in upcoming steps
         val favoriteRepository = MockFavoriteRepository
         val profileRepository = MockProfileRepository
 

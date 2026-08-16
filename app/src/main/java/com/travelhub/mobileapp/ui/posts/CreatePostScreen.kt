@@ -15,11 +15,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.travelhub.mobileapp.components.CategoryChip
+import com.travelhub.mobileapp.data.api.PostApi
 import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.api.SpotApi
 import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.MockPostRepository
 import com.travelhub.mobileapp.data.repository.MockSpotRepository
+import com.travelhub.mobileapp.data.repository.RealPostRepository
 import com.travelhub.mobileapp.data.repository.RealSpotRepository
 
 @Composable
@@ -36,9 +38,10 @@ fun CreatePostScreen(
                 val preferences = AppPreferences(context.applicationContext)
                 val retrofit = RetrofitClient.getInstance(preferences)
                 val spotApi = retrofit.create(SpotApi::class.java)
+                val postApi = retrofit.create(PostApi::class.java)
 
                 return CreatePostViewModel(
-                    postRepository = MockPostRepository(),
+                    postRepository = RealPostRepository(postApi),
                     spotRepository = RealSpotRepository(spotApi),
                     editingPostId = editingPostId
                 ) as T
