@@ -10,6 +10,7 @@ interface FavoriteRepository {
     val favoriteSpotIds: StateFlow<Set<Int>>
     suspend fun toggleFavorite(spot: Spot): Result<Boolean>
     suspend fun getFavoriteSpots(): Result<List<Spot>>
+    suspend fun refresh(): Result<Unit>
 }
 
 // Singleton mock repository — must be shared across screens so favorite state
@@ -25,11 +26,11 @@ object MockFavoriteRepository : FavoriteRepository {
         delay(200)
         val isNowFavorite: Boolean
         if (spot.id in _favoriteSpotIds.value) {
-            _favoriteSpotIds.value = _favoriteSpotIds.value - spot.id
+            _favoriteSpotIds.value -= spot.id
             favoriteSpots.remove(spot.id)
             isNowFavorite = false
         } else {
-            _favoriteSpotIds.value = _favoriteSpotIds.value + spot.id
+            _favoriteSpotIds.value += spot.id
             favoriteSpots[spot.id] = spot
             isNowFavorite = true
         }
@@ -39,5 +40,9 @@ object MockFavoriteRepository : FavoriteRepository {
     override suspend fun getFavoriteSpots(): Result<List<Spot>> {
         delay(300)
         return Result.success(favoriteSpots.values.toList())
+    }
+
+    override suspend fun refresh(): Result<Unit> {
+        return Result.success(Unit) // mock has no external source to reload from
     }
 }
