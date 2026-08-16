@@ -20,7 +20,8 @@ import com.travelhub.mobileapp.ui.explore.ExploreScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.travelhub.mobileapp.ui.destinations.DestinationDetailsScreen
-
+import com.travelhub.mobileapp.ui.posts.CreatePostScreen
+import com.travelhub.mobileapp.ui.posts.PostDetailsScreen
 @Composable
 fun MainNavHost() {
     val bottomNavController = rememberNavController()
@@ -60,6 +61,9 @@ fun MainNavHost() {
                     onSpotClick = { spotId ->
                         bottomNavController.navigate(Routes.DestinationDetails.createRoute(spotId))
                     },
+                    onPostClick = { postId ->
+                        bottomNavController.navigate(Routes.PostDetails.createRoute(postId))
+                    },
                     onSearchClick = {
                         bottomNavController.navigate(Routes.Explore.route)
                     }
@@ -77,7 +81,37 @@ fun MainNavHost() {
             composable(Routes.Profile.route) { PlaceholderScreen("Profile") }
 
             // Detail screens reachable from within the main shell
-            composable(Routes.CreatePost.route) { PlaceholderScreen("Create Post") }
+            composable(Routes.CreatePost.route) {
+                CreatePostScreen(
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onSubmitSuccess = { bottomNavController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Routes.PostDetails.route,
+                arguments = listOf(navArgument("postId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getInt("postId") ?: return@composable
+                PostDetailsScreen(
+                    postId = postId,
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onEditClick = { id -> bottomNavController.navigate(Routes.EditPost.createRoute(id)) },
+                    onDeleted = { bottomNavController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Routes.EditPost.route,
+                arguments = listOf(navArgument("postId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getInt("postId") ?: return@composable
+                CreatePostScreen(
+                    editingPostId = postId,
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onSubmitSuccess = { bottomNavController.popBackStack() }
+                )
+            }
             composable(Routes.EditProfile.route) { PlaceholderScreen("Edit Profile") }
             composable(Routes.Settings.route) { PlaceholderScreen("Settings") }
             composable(Routes.BookingHistory.route) { PlaceholderScreen("Booking History") }
