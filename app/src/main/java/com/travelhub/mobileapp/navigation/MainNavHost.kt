@@ -28,9 +28,14 @@ import com.travelhub.mobileapp.ui.services.ServiceDetailsScreen
 import com.travelhub.mobileapp.ui.services.BookingFormScreen
 import com.travelhub.mobileapp.ui.services.BookingConfirmationScreen
 import com.travelhub.mobileapp.ui.services.BookingHistoryScreen
+import com.travelhub.mobileapp.ui.profile.ProfileScreen
+import com.travelhub.mobileapp.ui.profile.EditProfileScreen
+import com.travelhub.mobileapp.ui.profile.SettingsScreen
 
 @Composable
-fun MainNavHost() {
+fun MainNavHost(
+    onLogout: () -> Unit
+) {
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -144,7 +149,23 @@ fun MainNavHost() {
                     }
                 )
             }
-            composable(Routes.Profile.route) { PlaceholderScreen("Profile") }
+            composable(Routes.Profile.route) {
+                ProfileScreen(
+                    onEditProfileClick = { bottomNavController.navigate(Routes.EditProfile.route) },
+                    onSettingsClick = { bottomNavController.navigate(Routes.Settings.route) },
+                    onBookingHistoryClick = { bottomNavController.navigate(Routes.BookingHistory.route) },
+                    onFavoritesClick = {
+                        bottomNavController.navigate(Routes.Favorites.route) {
+                            popUpTo(bottomNavController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onLoggedOut = onLogout
+                )
+            }
 
             // Detail screens reachable from within the main shell
             composable(Routes.CreatePost.route) {
@@ -178,8 +199,15 @@ fun MainNavHost() {
                     onSubmitSuccess = { bottomNavController.popBackStack() }
                 )
             }
-            composable(Routes.EditProfile.route) { PlaceholderScreen("Edit Profile") }
-            composable(Routes.Settings.route) { PlaceholderScreen("Settings") }
+            composable(Routes.EditProfile.route) {
+                EditProfileScreen(
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onSaved = { bottomNavController.popBackStack() }
+                )
+            }
+            composable(Routes.Settings.route) {
+                SettingsScreen(onBackClick = { bottomNavController.popBackStack() })
+            }
             composable(Routes.BookingHistory.route) {
                 BookingHistoryScreen()
             }

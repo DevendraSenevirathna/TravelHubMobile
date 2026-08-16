@@ -133,7 +133,7 @@ fun ProfileScreen(
                             "You haven't posted anything yet.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 20.dp, bottom = 24.dp)
+                            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
                         )
                     }
                 } else {
