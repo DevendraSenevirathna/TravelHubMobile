@@ -7,6 +7,7 @@ import com.travelhub.mobileapp.data.model.AuthResult
 import com.travelhub.mobileapp.data.model.RegisterRequest
 import com.travelhub.mobileapp.data.repository.AuthRepository
 import com.travelhub.mobileapp.data.repository.FavoriteRepository
+import com.travelhub.mobileapp.data.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 class RegisterViewModel(
     private val authRepository: AuthRepository,
     private val preferences: AppPreferences,
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Idle)
@@ -46,6 +48,7 @@ class RegisterViewModel(
                     preferences.setLoggedIn(true)
                     favoriteRepository.refresh()
                     _authResult.value = AuthResult.Success
+                    profileRepository.getProfile()
                 },
                 onFailure = { e ->
                     _authResult.value = AuthResult.Error(e.message ?: "Registration failed")

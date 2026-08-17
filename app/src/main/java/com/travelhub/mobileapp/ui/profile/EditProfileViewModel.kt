@@ -18,16 +18,27 @@ class EditProfileViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    private val _bio = MutableStateFlow(profileRepository.currentProfile.value?.bio ?: "")
+    private val _bio = MutableStateFlow("")
     val bio: StateFlow<String> = _bio
 
-    private val _interests = MutableStateFlow(
-        profileRepository.currentProfile.value?.interests?.toSet() ?: emptySet()
-    )
+    private val _interests = MutableStateFlow<Set<String>>(emptySet())
     val interests: StateFlow<Set<String>> = _interests
 
     private val _saveState = MutableStateFlow<EditProfileState>(EditProfileState.Idle)
     val saveState: StateFlow<EditProfileState> = _saveState
+
+    init {
+        viewModelScope.launch {
+            // Prefer whatever's already cached (avoids a redundant network call
+            // if ProfileScreen already loaded it), but fetch fresh if not present.
+            val cached = profileRepository.currentProfile.value
+            val profile = cached ?: profileRepository.getProfile().getOrNull()
+            if (profile != null) {
+                _bio.value = profile.bio
+                _interests.value = profile.interests.toSet()
+            }
+        }
+    }
 
     fun onBioChange(value: String) {
         _bio.value = value
