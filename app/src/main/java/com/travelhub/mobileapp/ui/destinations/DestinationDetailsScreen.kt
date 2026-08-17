@@ -39,6 +39,10 @@ import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.RealPostRepository
 import com.travelhub.mobileapp.data.repository.RealSpotRepository
 import com.travelhub.mobileapp.ui.RepositoryProvider
+import com.travelhub.mobileapp.data.api.ReviewApi
+import com.travelhub.mobileapp.data.repository.RealReviewRepository
+import androidx.compose.material.icons.filled.StarBorder
+
 
 @Composable
 fun DestinationDetailsScreen(
@@ -56,19 +60,21 @@ fun DestinationDetailsScreen(
                 val spotApi = retrofit.create(SpotApi::class.java)
                 val postApi = retrofit.create(PostApi::class.java)
                 val favoriteApi = retrofit.create(FavoriteApi::class.java)
+                val reviewApi = retrofit.create(ReviewApi::class.java)
 
                 return DestinationDetailsViewModel(
                     spotId = spotId,
                     spotRepository = RealSpotRepository(spotApi),
-                    reviewRepository = MockReviewRepository(),
+                    reviewRepository = RealReviewRepository(reviewApi), // ← swapped from Mock
                     postRepository = RealPostRepository(postApi),
-                    favoriteRepository = RepositoryProvider.getFavoriteRepository(favoriteApi) // ← swapped
+                    favoriteRepository = RepositoryProvider.getFavoriteRepository(favoriteApi)
                 ) as T
             }
         }
     )
     val uiState by viewModel.uiState.collectAsState()
     val favoriteSpotIds by viewModel.favoriteSpotIds.collectAsState()
+    val reviewError by viewModel.reviewError.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Back button bar
@@ -93,9 +99,12 @@ fun DestinationDetailsScreen(
             is DestinationDetailsUiState.Success -> DestinationDetailsContent(
                 state = state,
                 isFavorite = state.spot.id in favoriteSpotIds,
+                reviewError = reviewError,
                 onFavoriteClick = viewModel::toggleFavorite,
                 onPostClick = onPostClick,
-                onPostLikeClick = viewModel::toggleLikeOnPost,   // ← new
+                onPostLikeClick = viewModel::toggleLikeOnPost,
+                onSubmitReview = viewModel::submitReview,
+                onClearReviewError = viewModel::clearReviewError,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -106,9 +115,12 @@ fun DestinationDetailsScreen(
 private fun DestinationDetailsContent(
     state: DestinationDetailsUiState.Success,
     isFavorite: Boolean,
+    reviewError: String?,
     onFavoriteClick: () -> Unit,
     onPostClick: (Int) -> Unit,
-    onPostLikeClick: (Int) -> Unit,   // ← add this
+    onPostLikeClick: (Int) -> Unit,
+    onSubmitReview: (Int, String) -> Unit,
+    onClearReviewError: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.fillMaxWidth()) {
@@ -200,6 +212,66 @@ private fun DestinationDetailsContent(
             )
         }
 
+        item {
+            var showReviewForm by remember { mutableStateOf(false) }
+            var reviewRating by remember { mutableStateOf(5) }
+            var reviewComment by remember { mutableStateOf("") }
+
+            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                if (!showReviewForm) {
+                    OutlinedButton(onClick = { showReviewForm = true }) {
+                        Text("Write a Review")
+                    }
+                } else {
+                    Text("Your rating", style = MaterialTheme.typography.titleSmall)
+                    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+                        (1..5).forEach { star ->
+                            IconButton(onClick = { reviewRating = star }, modifier = Modifier.size(32.dp)) {
+                                Icon(
+                                    imageVector = if (star <= reviewRating) Icons.Filled.Star else Icons.Filled.StarBorder,
+                                    contentDescription = "$star stars",
+                                    tint = Color(0xFFFFB300)
+                                )
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = reviewComment,
+                        onValueChange = { reviewComment = it },
+                        label = { Text("Your review") },
+                        minLines = 2,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (reviewError != null) {
+                        Text(
+                            reviewError,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    Row(modifier = Modifier.padding(top = 8.dp)) {
+                        Button(onClick = {
+                            onSubmitReview(reviewRating, reviewComment)
+                            showReviewForm = false
+                            reviewComment = ""
+                            reviewRating = 5
+                        }) {
+                            Text("Submit")
+                        }
+                        TextButton(
+                            onClick = {
+                                showReviewForm = false
+                                onClearReviewError()
+                            },
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                }
+            }
+        }
         if (state.reviews.isEmpty()) {
             item {
                 Text(

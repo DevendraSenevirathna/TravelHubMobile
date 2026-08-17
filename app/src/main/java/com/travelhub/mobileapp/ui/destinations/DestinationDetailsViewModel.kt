@@ -33,7 +33,8 @@ class DestinationDetailsViewModel(
 
     private val _uiState = MutableStateFlow<DestinationDetailsUiState>(DestinationDetailsUiState.Loading)
     val uiState: StateFlow<DestinationDetailsUiState> = _uiState
-
+    private val _reviewError = MutableStateFlow<String?>(null)
+    val reviewError: StateFlow<String?> = _reviewError
     val favoriteSpotIds: StateFlow<Set<Int>> = favoriteRepository.favoriteSpotIds
 
     init {
@@ -85,10 +86,20 @@ class DestinationDetailsViewModel(
         val current = _uiState.value
         if (current is DestinationDetailsUiState.Success) {
             viewModelScope.launch {
-                reviewRepository.addReview(spotId, rating, comment).onSuccess { newReview ->
-                    _uiState.value = current.copy(reviews = current.reviews + newReview)
-                }
+                _reviewError.value = null
+                reviewRepository.addReview(spotId, rating, comment).fold(
+                    onSuccess = { newReview ->
+                        _uiState.value = current.copy(reviews = current.reviews + newReview)
+                    },
+                    onFailure = { e ->
+                        _reviewError.value = e.message ?: "Couldn't submit review"
+                    }
+                )
             }
         }
+    }
+
+    fun clearReviewError() {
+        _reviewError.value = null
     }
 }
