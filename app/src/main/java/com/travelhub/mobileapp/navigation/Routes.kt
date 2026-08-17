@@ -19,6 +19,7 @@ sealed class Routes(val route: String) {
         fun createRoute(spotId: Int) = "destination_details/$spotId"
     }
     object CreatePost : Routes("create_post")
+    object CreateSpot : Routes("create_spot")
     object PostDetails : Routes("post_details/{postId}") {
         fun createRoute(postId: Int) = "post_details/$postId"
     }

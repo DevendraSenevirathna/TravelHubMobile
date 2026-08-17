@@ -9,6 +9,7 @@ interface SpotRepository {
     suspend fun getAllSpots(): Result<List<Spot>>
     suspend fun searchSpots(query: String, category: String?): Result<List<Spot>>
     suspend fun getSpotById(id: Int): Result<Spot>
+    suspend fun createSpot(name: String, description: String, category: String, latitude: Double, longitude: Double): Result<Spot>
 }
 
 class MockSpotRepository : SpotRepository {
@@ -51,5 +52,24 @@ class MockSpotRepository : SpotRepository {
         delay(300)
         val spot = mockSpots.find { it.id == id }
         return if (spot != null) Result.success(spot) else Result.failure(Exception("Spot not found"))
+    }
+
+    override suspend fun createSpot(
+        name: String, description: String, category: String, latitude: Double, longitude: Double
+    ): Result<Spot> {
+        delay(400)
+        val newSpot = Spot(
+            id = (mockSpots.maxOfOrNull { it.id } ?: 0) + 1,
+            name = name,
+            description = description,
+            category = category,
+            latitude = latitude,
+            longitude = longitude,
+            status = "pending",
+            createdBy = "you",
+            imageUrl = null,
+            averageRating = 0.0
+        )
+        return Result.success(newSpot)
     }
 }

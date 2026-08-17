@@ -14,15 +14,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.travelhub.mobileapp.ui.AddMenuBottomSheet
-import com.travelhub.mobileapp.ui.PlaceholderScreen
 import com.travelhub.mobileapp.ui.destinations.DestinationDetailsScreen
 import com.travelhub.mobileapp.ui.explore.ExploreScreen
 import com.travelhub.mobileapp.ui.favorites.FavoritesScreen
@@ -37,6 +37,7 @@ import com.travelhub.mobileapp.ui.services.BookingFormScreen
 import com.travelhub.mobileapp.ui.services.BookingHistoryScreen
 import com.travelhub.mobileapp.ui.services.ServiceDetailsScreen
 import com.travelhub.mobileapp.ui.services.ServicesScreen
+import com.travelhub.mobileapp.ui.spots.CreateSpotScreen
 
 @Composable
 fun MainNavHost(
@@ -78,7 +79,7 @@ fun MainNavHost(
         NavHost(
             navController = bottomNavController,
             startDestination = Routes.Home.route,
-            modifier = androidx.compose.ui.Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(Routes.Home.route) {
                 HomeScreen(
@@ -143,6 +144,12 @@ fun MainNavHost(
 
             composable(Routes.CreatePost.route) {
                 CreatePostScreen(
+                    onBackClick = { bottomNavController.popBackStack() },
+                    onSubmitSuccess = { bottomNavController.popBackStack() }
+                )
+            }
+            composable(Routes.CreateSpot.route) {
+                CreateSpotScreen(
                     onBackClick = { bottomNavController.popBackStack() },
                     onSubmitSuccess = { bottomNavController.popBackStack() }
                 )
@@ -246,7 +253,7 @@ fun MainNavHost(
             onDismiss = { showAddMenu = false },
             onCreateSpotClick = {
                 showAddMenu = false
-                // TODO: wire to Create Spot screen in the next step
+                bottomNavController.navigate(Routes.CreateSpot.route)
             },
             onUploadPostClick = {
                 showAddMenu = false
