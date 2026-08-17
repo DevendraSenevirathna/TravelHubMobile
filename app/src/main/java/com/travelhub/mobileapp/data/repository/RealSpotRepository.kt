@@ -1,6 +1,7 @@
 package com.travelhub.mobileapp.data.repository
 
 import com.travelhub.mobileapp.data.api.SpotApi
+import com.travelhub.mobileapp.data.api.dto.CreateSpotRequestDto
 import com.travelhub.mobileapp.data.api.dto.SpotDto
 import com.travelhub.mobileapp.data.model.Spot
 
@@ -60,6 +61,24 @@ class RealSpotRepository(
                 val dto = response.body()
                 if (dto != null) Result.success(dto.toDomain())
                 else Result.failure(Exception("Spot not found"))
+            } else {
+                Result.failure(Exception(parseApiError(response.errorBody())))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception(networkErrorMessage(e)))
+        }
+    }
+    override suspend fun createSpot(
+        name: String, description: String, category: String, latitude: Double, longitude: Double
+    ): Result<Spot> {
+        return try {
+            val response = spotApi.createSpot(
+                CreateSpotRequestDto(name, description, category, latitude, longitude)
+            )
+            if (response.isSuccessful) {
+                val dto = response.body()
+                if (dto != null) Result.success(dto.toDomain())
+                else Result.failure(Exception("Empty response from server"))
             } else {
                 Result.failure(Exception(parseApiError(response.errorBody())))
             }
