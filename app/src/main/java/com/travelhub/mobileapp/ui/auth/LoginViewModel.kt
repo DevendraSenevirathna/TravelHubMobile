@@ -7,6 +7,7 @@ import com.travelhub.mobileapp.data.model.AuthResult
 import com.travelhub.mobileapp.data.model.LoginRequest
 import com.travelhub.mobileapp.data.repository.AuthRepository
 import com.travelhub.mobileapp.data.repository.FavoriteRepository
+import com.travelhub.mobileapp.data.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val authRepository: AuthRepository,
     private val preferences: AppPreferences,
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     private val _authResult = MutableStateFlow<AuthResult>(AuthResult.Idle)
@@ -32,7 +34,8 @@ class LoginViewModel(
             result.fold(
                 onSuccess = {
                     preferences.setLoggedIn(true)
-                    favoriteRepository.refresh() // ← add this
+                    favoriteRepository.refresh()
+                    profileRepository.getProfile()   // ← add this
                     _authResult.value = AuthResult.Success
                 },
                 onFailure = { e ->

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.FavoriteRepository
+import com.travelhub.mobileapp.data.repository.ProfileRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ enum class SplashDestination { LOADING, ONBOARDING, AUTH, MAIN }
 
 class SplashViewModel(
     private val preferences: AppPreferences,
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     private val _destination = MutableStateFlow(SplashDestination.LOADING)
@@ -28,7 +30,8 @@ class SplashViewModel(
             val loggedIn = preferences.isLoggedIn.first()
 
             if (loggedIn) {
-                favoriteRepository.refresh() // ← add this
+                favoriteRepository.refresh()
+                profileRepository.getProfile()
             }
 
             _destination.value = when {

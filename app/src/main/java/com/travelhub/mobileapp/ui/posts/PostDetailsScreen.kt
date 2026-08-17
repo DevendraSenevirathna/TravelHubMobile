@@ -33,6 +33,10 @@ import com.travelhub.mobileapp.data.api.PostApi
 import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.RealPostRepository
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import com.travelhub.mobileapp.data.api.AuthApi
+import com.travelhub.mobileapp.ui.RepositoryProvider
 
 sealed class PostDetailsUiState {
     object Loading : PostDetailsUiState()
@@ -92,11 +96,13 @@ fun PostDetailsScreen(
     onDeleted: () -> Unit
 ) {
     val context = LocalContext.current
-    var currentUsername by remember { mutableStateOf<String?>(null) }
+    val preferences = remember { AppPreferences(context.applicationContext) }
+    val retrofit = remember { RetrofitClient.getInstance(preferences) }
+    val authApi = remember { retrofit.create(AuthApi::class.java) }
+    val profileRepository = remember { RepositoryProvider.getProfileRepository(authApi) }
+    val currentProfile by profileRepository.currentProfile.collectAsState()
+    val currentUsername = currentProfile?.username
 
-    LaunchedEffect(Unit) {
-        currentUsername = AppPreferences(context.applicationContext).getUsername()
-    }
     val viewModel: PostDetailsViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
