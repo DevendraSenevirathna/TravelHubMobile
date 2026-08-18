@@ -1,17 +1,27 @@
 package com.travelhub.mobileapp.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.travelhub.mobileapp.components.EmptyState
 import com.travelhub.mobileapp.components.ErrorState
@@ -19,10 +29,7 @@ import com.travelhub.mobileapp.components.LoadingState
 import com.travelhub.mobileapp.components.PostCard
 import com.travelhub.mobileapp.components.SpotCard
 import com.travelhub.mobileapp.ui.AppViewModelFactory
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.ui.composed
-import androidx.compose.runtime.remember
+
 fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed {
     this.clickable(
         interactionSource = remember { MutableInteractionSource() },
@@ -30,6 +37,7 @@ fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed {
         onClick = onClick
     )
 }
+
 @Composable
 fun HomeScreen(
     onSpotClick: (Int) -> Unit,
@@ -71,27 +79,96 @@ private fun HomeContent(
     onLikeClick: (Int) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFFAFAFA)),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Text("Good morning, Explorer 🌿", style = MaterialTheme.typography.headlineMedium)
-                Spacer(modifier = Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    readOnly = true,
-                    enabled = false,
-                    placeholder = { Text("Search destinations...") },
-                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 4.dp, bottom = 12.dp)
+            ) {
+                // 1. Centered App Title pulled to the very top with Notification Bell
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickableNoRipple { onSearchClick() },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        .padding(bottom = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "TravelHub",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20),
+                        textAlign = TextAlign.Center
                     )
+
+                    IconButton(
+                        onClick = { /* Handle Notifications */ },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.NotificationsNone,
+                            contentDescription = "Notifications",
+                            tint = Color(0xFF212121),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                // 2. Greeting Header
+                Text(
+                    text = "Hello, Adventurer!",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1C1B1F)
                 )
+
+                Text(
+                    text = "Ready to explore the conscious way?",
+                    fontSize = 14.sp,
+                    color = Color(0xFF757575),
+                    modifier = Modifier.padding(top = 2.dp, bottom = 14.dp)
+                )
+
+                // 3. Rounded Search Bar
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clickableNoRipple { onSearchClick() },
+                    shape = RoundedCornerShape(25.dp),
+                    color = Color.White,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE0E0E0)),
+                    shadowElevation = 1.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = Color(0xFF757575),
+                            modifier = Modifier.size(22.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Text(
+                            text = "Where to next?",
+                            fontSize = 14.5.sp,
+                            color = Color(0xFF9E9E9E)
+                        )
+                    }
+                }
             }
         }
 
@@ -169,7 +246,7 @@ private fun HomeContent(
                         likesCount = post.likesCount,
                         isLiked = post.isLiked,
                         onLikeClick = { onLikeClick(post.id) },
-                        onClick = { onPostClick(post.id) }   // ← changed
+                        onClick = { onPostClick(post.id) }
                     )
                 }
             }
@@ -182,6 +259,7 @@ private fun SectionHeader(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 12.dp)
     )
 }

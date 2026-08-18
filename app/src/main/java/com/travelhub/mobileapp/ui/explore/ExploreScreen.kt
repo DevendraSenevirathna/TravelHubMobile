@@ -1,16 +1,18 @@
 package com.travelhub.mobileapp.ui.explore
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,23 +36,37 @@ fun ExploreScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            "Explore",
+            text = "Explore",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 12.dp)
         )
 
+        // Rounded Modern Search Bar
         OutlinedTextField(
             value = query,
             onValueChange = viewModel::onQueryChange,
-            placeholder = { Text("Search destinations...") },
-            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+            placeholder = { Text("Search destinations...", color = Color(0xFF9E9E9E)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search Icon",
+                    tint = Color(0xFF757575)
+                )
+            },
             singleLine = true,
+            shape = RoundedCornerShape(26.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedBorderColor = Color(0xFF1B5E20),
+                unfocusedBorderColor = Color(0xFFE0E0E0)
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
