@@ -39,6 +39,11 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showLogoutConfirm by remember { mutableStateOf(false) }
 
+    // requiring an app restart.
+    LaunchedEffect(Unit) {
+        viewModel.load()
+    }
+
     when (val state = uiState) {
         is ProfileUiState.Loading -> LoadingState(modifier = Modifier.fillMaxSize())
         is ProfileUiState.Error -> ErrorState(
