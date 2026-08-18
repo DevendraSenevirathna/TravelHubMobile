@@ -9,6 +9,12 @@ data class SpotImageDto(
 )
 
 @Serializable
+data class UploadImageResponseDto(
+    val id: Int,
+    val image: String
+)
+
+@Serializable
 data class SpotDto(
     val id: Int,
     val name: String,

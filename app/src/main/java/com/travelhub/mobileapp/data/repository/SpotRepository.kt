@@ -2,6 +2,7 @@ package com.travelhub.mobileapp.data.repository
 
 import com.travelhub.mobileapp.data.model.Spot
 import kotlinx.coroutines.delay
+import okhttp3.MultipartBody
 
 interface SpotRepository {
     suspend fun getNearbySpots(): Result<List<Spot>>
@@ -10,6 +11,8 @@ interface SpotRepository {
     suspend fun searchSpots(query: String, category: String?): Result<List<Spot>>
     suspend fun getSpotById(id: Int): Result<Spot>
     suspend fun createSpot(name: String, description: String, category: String, latitude: Double, longitude: Double): Result<Spot>
+    suspend fun uploadSpotImage(spotId: Int, imagePart: MultipartBody.Part): Result<String> // returns image URL
+    suspend fun deleteSpotImage(spotId: Int, imageId: Int): Result<Unit>
 }
 
 class MockSpotRepository : SpotRepository {
@@ -71,5 +74,13 @@ class MockSpotRepository : SpotRepository {
             averageRating = 0.0
         )
         return Result.success(newSpot)
+    }
+    override suspend fun uploadSpotImage(spotId: Int, imagePart: MultipartBody.Part): Result<String> {
+        delay(400)
+        return Result.success("https://example.com/mock-image.jpg")
+    }
+    override suspend fun deleteSpotImage(spotId: Int, imageId: Int): Result<Unit> {
+        delay(300)
+        return Result.success(Unit)
     }
 }

@@ -4,6 +4,7 @@ import com.travelhub.mobileapp.data.api.SpotApi
 import com.travelhub.mobileapp.data.api.dto.CreateSpotRequestDto
 import com.travelhub.mobileapp.data.api.dto.SpotDto
 import com.travelhub.mobileapp.data.model.Spot
+import okhttp3.MultipartBody
 
 class RealSpotRepository(
     private val spotApi: SpotApi
@@ -82,6 +83,30 @@ class RealSpotRepository(
             } else {
                 Result.failure(Exception(parseApiError(response.errorBody())))
             }
+        } catch (e: Exception) {
+            Result.failure(Exception(networkErrorMessage(e)))
+        }
+    }
+    override suspend fun uploadSpotImage(spotId: Int, imagePart: MultipartBody.Part): Result<String> {
+        return try {
+            val response = spotApi.uploadSpotImage(spotId, imagePart)
+            if (response.isSuccessful) {
+                val dto = response.body()
+                if (dto != null) Result.success(dto.image)
+                else Result.failure(Exception("Empty response from server"))
+            } else {
+                Result.failure(Exception(parseApiError(response.errorBody())))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception(networkErrorMessage(e)))
+        }
+    }
+
+    override suspend fun deleteSpotImage(spotId: Int, imageId: Int): Result<Unit> {
+        return try {
+            val response = spotApi.deleteSpotImage(spotId, imageId)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception(parseApiError(response.errorBody())))
         } catch (e: Exception) {
             Result.failure(Exception(networkErrorMessage(e)))
         }
