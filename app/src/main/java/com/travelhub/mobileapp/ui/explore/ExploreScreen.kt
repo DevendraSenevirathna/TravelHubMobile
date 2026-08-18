@@ -32,6 +32,10 @@ fun ExploreScreen(
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val favoriteSpotIds by viewModel.favoriteSpotIds.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             "Explore",

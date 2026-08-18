@@ -41,6 +41,10 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val favoriteSpotIds by viewModel.favoriteSpotIds.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadHome()
+    }
+
     when (val state = uiState) {
         is HomeUiState.Loading -> LoadingState(modifier = Modifier.fillMaxSize())
         is HomeUiState.Error -> ErrorState(

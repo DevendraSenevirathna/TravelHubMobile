@@ -39,6 +39,9 @@ class ExploreViewModel(
         search()
     }
 
+    fun refresh() {
+        search()
+    }
     fun onQueryChange(newQuery: String) {
         _query.value = newQuery
         search()
