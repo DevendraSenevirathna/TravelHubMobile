@@ -4,6 +4,7 @@ import com.travelhub.mobileapp.data.api.PostApi
 import com.travelhub.mobileapp.data.api.dto.CreatePostRequestDto
 import com.travelhub.mobileapp.data.api.dto.PostDto
 import com.travelhub.mobileapp.data.model.Post
+import okhttp3.MultipartBody
 
 class RealPostRepository(
     private val postApi: PostApi
@@ -100,6 +101,30 @@ class RealPostRepository(
             } else {
                 Result.failure(Exception(parseApiError(response.errorBody())))
             }
+        } catch (e: Exception) {
+            Result.failure(Exception(networkErrorMessage(e)))
+        }
+    }
+    override suspend fun uploadPostImage(postId: Int, imagePart: MultipartBody.Part): Result<String> {
+        return try {
+            val response = postApi.uploadPostImage(postId, imagePart)
+            if (response.isSuccessful) {
+                val dto = response.body()
+                if (dto != null) Result.success(dto.image)
+                else Result.failure(Exception("Empty response from server"))
+            } else {
+                Result.failure(Exception(parseApiError(response.errorBody())))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception(networkErrorMessage(e)))
+        }
+    }
+
+    override suspend fun deletePostImage(postId: Int, imageId: Int): Result<Unit> {
+        return try {
+            val response = postApi.deletePostImage(postId, imageId)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception(parseApiError(response.errorBody())))
         } catch (e: Exception) {
             Result.failure(Exception(networkErrorMessage(e)))
         }

@@ -1,26 +1,34 @@
 package com.travelhub.mobileapp.ui.posts
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.travelhub.mobileapp.components.CategoryChip
 import com.travelhub.mobileapp.data.api.PostApi
 import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.api.SpotApi
+import com.travelhub.mobileapp.data.api.uriToImagePart
 import com.travelhub.mobileapp.data.local.AppPreferences
-import com.travelhub.mobileapp.data.repository.MockPostRepository
-import com.travelhub.mobileapp.data.repository.MockSpotRepository
 import com.travelhub.mobileapp.data.repository.RealPostRepository
 import com.travelhub.mobileapp.data.repository.RealSpotRepository
 
@@ -52,7 +60,12 @@ fun CreatePostScreen(
     val caption by viewModel.caption.collectAsState()
     val selectedSpot by viewModel.selectedSpot.collectAsState()
     val availableSpots by viewModel.availableSpots.collectAsState()
+    val selectedImageUri by viewModel.selectedImageUri.collectAsState()
     val submitState by viewModel.submitState.collectAsState()
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri -> viewModel.onImageSelected(uri) }
 
     LaunchedEffect(submitState) {
         if (submitState is SubmitState.Success) onSubmitSuccess()
@@ -74,16 +87,35 @@ fun CreatePostScreen(
         }
 
         Column(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
-            // Image upload placeholder — flagged backend gap, see note below
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp)
-                    .padding(bottom = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                OutlinedButton(onClick = { /* TODO: image picker, pending multipart API */ }) {
-                    Text("Add Photo (coming soon)")
+            // Image picker — only offered in create mode; editing an existing
+            // post's image isn't supported yet (see CreatePostViewModel.submit()).
+            if (!viewModel.isEditMode) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .padding(bottom = 16.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable {
+                            imagePickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (selectedImageUri != null) {
+                        AsyncImage(
+                            model = selectedImageUri,
+                            contentDescription = "Selected image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.AddPhotoAlternate, contentDescription = null)
+                            Text("Tap to add a photo", style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
                 }
             }
 
@@ -128,7 +160,7 @@ fun CreatePostScreen(
         }
 
         Button(
-            onClick = { viewModel.submit() },
+            onClick = { viewModel.submit { uri -> uriToImagePart(context, uri) } },
             enabled = submitState !is SubmitState.Loading,
             modifier = Modifier
                 .fillMaxWidth()

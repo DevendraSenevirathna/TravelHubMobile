@@ -2,6 +2,7 @@ package com.travelhub.mobileapp.data.repository
 
 import com.travelhub.mobileapp.data.model.Post
 import kotlinx.coroutines.delay
+import okhttp3.MultipartBody
 
 interface PostRepository {
     suspend fun getFeed(): Result<List<Post>>
@@ -11,6 +12,8 @@ interface PostRepository {
     suspend fun getPostById(id: Int): Result<Post>
     suspend fun updatePost(id: Int, caption: String): Result<Post>
     suspend fun deletePost(id: Int): Result<Unit>
+    suspend fun uploadPostImage(postId: Int, imagePart: MultipartBody.Part): Result<String>
+    suspend fun deletePostImage(postId: Int, imageId: Int): Result<Unit>
 }
 
 class MockPostRepository : PostRepository {
@@ -80,5 +83,14 @@ class MockPostRepository : PostRepository {
         delay(400)
         val removed = mockPosts.removeIf { it.id == id }
         return if (removed) Result.success(Unit) else Result.failure(Exception("Post not found"))
+    }
+    override suspend fun uploadPostImage(postId: Int, imagePart: MultipartBody.Part): Result<String> {
+        delay(400)
+        return Result.success("https://example.com/mock-post-image.jpg")
+    }
+
+    override suspend fun deletePostImage(postId: Int, imageId: Int): Result<Unit> {
+        delay(300)
+        return Result.success(Unit)
     }
 }

@@ -5,6 +5,8 @@ import com.travelhub.mobileapp.data.api.dto.PostDto
 import com.travelhub.mobileapp.data.api.dto.ToggleLikeResponseDto
 import retrofit2.Response
 import retrofit2.http.*
+import okhttp3.MultipartBody
+import com.travelhub.mobileapp.data.api.dto.UploadImageResponseDto
 
 interface PostApi {
     @GET("posts/")
@@ -24,4 +26,17 @@ interface PostApi {
 
     @POST("posts/{id}/toggle_like/")
     suspend fun toggleLike(@Path("id") id: Int): Response<ToggleLikeResponseDto>
+
+    @Multipart
+    @POST("posts/{id}/upload_image/")
+    suspend fun uploadPostImage(
+        @Path("id") id: Int,
+        @Part image: MultipartBody.Part
+    ): Response<UploadImageResponseDto>
+
+    @DELETE("posts/{id}/images/{imageId}/")
+    suspend fun deletePostImage(
+        @Path("id") id: Int,
+        @Path("imageId") imageId: Int
+    ): Response<Unit>
 }

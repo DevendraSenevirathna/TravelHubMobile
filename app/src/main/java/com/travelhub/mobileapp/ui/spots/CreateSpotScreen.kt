@@ -23,6 +23,16 @@ import com.travelhub.mobileapp.data.api.RetrofitClient
 import com.travelhub.mobileapp.data.api.SpotApi
 import com.travelhub.mobileapp.data.local.AppPreferences
 import com.travelhub.mobileapp.data.repository.RealSpotRepository
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.travelhub.mobileapp.data.api.uriToImagePart
 
 @Composable
 fun CreateSpotScreen(
@@ -47,7 +57,12 @@ fun CreateSpotScreen(
     val category by viewModel.category.collectAsState()
     val latitude by viewModel.latitude.collectAsState()
     val longitude by viewModel.longitude.collectAsState()
+    val selectedImageUri by viewModel.selectedImageUri.collectAsState()
     val submitState by viewModel.submitState.collectAsState()
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri -> viewModel.onImageSelected(uri) }
 
     LaunchedEffect(submitState) {
         if (submitState is CreateSpotState.Success) onSubmitSuccess()
@@ -80,6 +95,37 @@ fun CreateSpotScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+
+            // Image picker
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .padding(bottom = 16.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable {
+                        imagePickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                val selectedImageUri by viewModel.selectedImageUri.collectAsState()
+                if (selectedImageUri != null) {
+                    AsyncImage(
+                        model = selectedImageUri,
+                        contentDescription = "Selected image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.AddPhotoAlternate, contentDescription = null)
+                        Text("Tap to add a photo")
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = name,
@@ -148,7 +194,9 @@ fun CreateSpotScreen(
         }
 
         Button(
-            onClick = { viewModel.submit() },
+            onClick = {
+                viewModel.submit { uri -> uriToImagePart(context, uri) }
+            },
             enabled = submitState !is CreateSpotState.Loading,
             modifier = Modifier.fillMaxWidth().padding(20.dp).height(48.dp)
         ) {
